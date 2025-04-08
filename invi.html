@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invisibility Cloak</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; }
+        video, canvas { width: 640px; height: 480px; }
+    </style>
+</head>
+<body>
+    <h1>Invisibility Cloak</h1>
+    <select id="colorSelect">
+        <option value="red">Red</option>
+        <option value="blue">Blue</option>
+        <option value="white">White</option>
+    </select>
+    <button onclick="startEffect()">Start</button>
+    <br>
+    <video id="video" autoplay></video>
+    <canvas id="canvas"></canvas>
+    
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let selectedColor = 'red';
+
+        document.getElementById('colorSelect').addEventListener('change', (e) => {
+            selectedColor = e.target.value;
+        });
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => console.error('Error accessing webcam:', err));
+
+        function startEffect() {
+            setInterval(() => {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                let frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let data = frame.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i], g = data[i + 1], b = data[i + 2];
+
+                    if (selectedColor === 'red' && r > 150 && g < 80 && b < 80) {
+                        data[i + 3] = 0;
+                    } else if (selectedColor === 'blue' && b > 150 && r < 80 && g < 80) {
+                        data[i + 3] = 0;
+                    } else if (selectedColor === 'white' && r > 200 && g > 200 && b > 200) {
+                        data[i + 3] = 0;
+                    }
+                }
+                
+                ctx.putImageData(frame, 0, 0);
+            }, 50);
+        }
+        // Firebase Configuration
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+const googleSignInBtn = document.getElementById("googleSignIn");
+const uploadPostBtn = document.getElementById("uploadPost");
+
+let user = null;
+
+// Google Authentication
+googleSignInBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider).then(result => {
+        user = result.user;
+        document.getElementById("auth").style.display = "none";
+        document.getElementById("app").style.display = "block";
+        document.getElementById("username").innerText = user.displayName;
+        loadPosts();
+        loadStories();
+    }).catch(error => console.error("Error signing in:", error));
+});
+
+// Upload Post
+uploadPostBtn.addEventListener("click", async () => {
+    const text = document.getElementById("newPost").value;
+    const file = document.getElementById("imageUpload").files[0];
+
+    let imageUrl = null;
+    if (file) {
+        const storageRef = storage.ref(`images/${Date.now()}_${file.name}`);
+        await storageRef.put(file);
+        imageUrl = await storageRef.getDownloadURL();
+    }
+
+    await db.collection("posts").add({ text, image: imageUrl, user: user.displayName, likes: 0, comments: [] });
+
+    document.getElementById("newPost").value = "";
+    document.getElementById("imageUpload").value = "";
+    loadPosts();
+});
+
+// Load Posts
+function loadPosts() {
+    db.collection("posts").onSnapshot(snapshot => {
+        const postsContainer = document.getElementById("posts");
+        postsContainer.innerHTML = "";
+        snapshot.forEach(doc => {
+            const post = doc.data();
+            const postElement = document.createElement("div");
+            postElement.innerHTML = `
+                <p><strong>${post.user}</strong>: ${post.text}</p>
+                ${post.image ? `<img src="${post.image}" width="200">` : ""}
+                <p>Likes: ${post.likes}</p>
+            `;
+            postsContainer.appendChild(postElement);
+        });
+    });
+}
+
+// Load Stories
+function loadStories() {
+    db.collection("stories").onSnapshot(snapshot => {
+        const storiesContainer = document.getElementById("stories");
+        storiesContainer.innerHTML = "";
+        snapshot.forEach(doc => {
+            const story = doc.data();
+            const storyElement = document.createElement("img");
+            storyElement.src = story.image;
+            storiesContainer.appendChild(storyElement);
+        });
+    });
+}
+
+    </script>
+</body>
+</html>

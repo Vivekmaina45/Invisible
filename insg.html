@@ -1,0 +1,67 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media App</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="auth">
+        <button id="signInBtn">Sign in with Google</button>
+        <p id="welcomeMsg"></p>
+    </div>
+    
+    <div id="post-section" style="display: none;">
+        <input type="text" id="postText" placeholder="Write a post...">
+        <input type="file" id="imageUpload">
+        <button id="postBtn">Post</button>
+    </div>
+    
+    <div id="posts"></div>
+    
+    <script src="script.js"></script>
+</body>
+</html> -->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js"></script>
+</head>
+<body>
+    <div id="auth">
+        <button id="googleSignIn">Sign in with Google</button>
+    </div>
+    
+    <div id="app" style="display: none;">
+        <h2>Welcome, <span id="username"></span></h2>
+
+        <div id="postSection">
+            <input type="text" id="newPost" placeholder="Write a post...">
+            <input type="file" id="imageUpload">
+            <button id="uploadPost">Post</button>
+        </div>
+
+        <h3>Stories</h3>
+        <div id="stories"></div>
+
+        <h3>Posts</h3>
+        <div id="posts"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
